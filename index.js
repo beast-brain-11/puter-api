@@ -1,34 +1,33 @@
 const express = require('express');
 const app = express();
+const axios = require('axios');
 
-app.use(express.json()); // Middleware to parse JSON request bodies
+// Replace the API endpoint URL and authentication details as needed
+const apiEndpoint = 'https://api.puter.com/v2/chat';
+const authToken = 'YOUR_AUTH_TOKEN_HERE';
+const APIOrigin = 'https://api.puter.com';
 
-async function streamClaudeResponse(prompt) {
-    const response = await puter.ai.chat(
-        prompt, 
-        { model: 'claude-3-5-sonnet', stream: true }
-    );
+app.post('/api/chat', async (req, res) => {
+  const { prompt, model } = req.body;
+  const url = `${apiEndpoint}?model=${model}&prompt=${prompt}`;
+  const config = {
+    method: 'post',
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+  };
 
-    let result = '';
-    for await (const part of response) {
-        result += part?.text;
-    }
-    return result;
-}
+  const response = await axios(config);
+  const responseData = response.data;
 
-app.post('/stream-response', async (req, res) => {
-    const { prompt } = req.body;
-    if (!prompt) {
-        return res.status(400).send('Prompt is required!');
-    }
-
-    try {
-        const data = await streamClaudeResponse(prompt);
-        res.status(200).send(data);
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Something went wrong!');
-    }
+  // Stream the response back to the client
+  res.set("Content-Type", "application/json");
+  res.write(JSON.stringify(responseData));
+  res.end();
 });
 
-module.exports = app; // Export for Vercel
+app.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
