@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "path": "/v1/chat/completions",
+      "method": "POST",
+      "auth": ["auth.puter.com"],
+      "rateLimit": {
+        "period": "1h",
+        "quota": 100
+      }
+    }
+  ]
+}
