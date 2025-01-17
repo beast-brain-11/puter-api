@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat API</title>
+</head>
+<body>
+  <h1>Chat API</h1>
+  <form id="chat-form">
+    <input type="text" id="prompt" placeholder="Enter your prompt" required>
+    <button type="submit">Send</button>
+  </form>
+  <div id="response"></div>
+
+  <script>
+    document.getElementById('chat-form').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const prompt = document.getElementById('prompt').value;
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await response.json();
+      document.getElementById('response').innerText = data.text;
+    });
+  </script>
+</body>
+</html>
